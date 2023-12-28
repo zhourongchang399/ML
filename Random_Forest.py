@@ -7,7 +7,7 @@ from sklearn.metrics import confusion_matrix, precision_score, recall_score
 data = load_breast_cancer()
 x_train, x_test, y_train, y_test = train_test_split(data['data'],
                                                     data['target'],
-                                                    test_size=0.3)
+                                                    test_size=0.3,random_state=23)
 
 
 class Node:
@@ -101,14 +101,13 @@ class Random_forest:
     def fit(self):
         sample_nums, feature_nums = self.X.shape
         for num in range(self.tree_nums):
-            select_sample = np.random.choice(sample_nums, size=300, replace=False)
-            select_feature = np.random.choice(feature_nums, size=20, replace=False)
+            select_sample = np.random.choice(sample_nums, size=int(sample_nums*0.8,), replace=False)
+            select_feature = np.random.choice(feature_nums, size=int(feature_nums*0.8), replace=False)
             # select_sample = np.random.randint(0, 2,
             #                                   size=sample_nums).astype(bool)
             # select_feature = np.random.randint(0, 2,
             #                                    size=feature_nums).astype(bool)
-            x = self.X[select_sample]
-            x = x[:,select_feature]
+            x = self.X[select_sample][:,select_feature]
             y = self.y[select_sample]
 
             tree = Tree(self.build_dicision_tree(x, y, 0, self.layers),
@@ -124,10 +123,7 @@ class Random_forest:
                 predictions.append(self.predict_tree(node, i))
             self.result.append(predictions)
         self.result = np.array(self.result)
-        self.result = self.result.reshape(X.shape[0], len(self.trees))
-        predictions = []
-        for r in self.result:
-            predictions.append(np.argmax(np.bincount(r)))
+        predictions = np.apply_along_axis(lambda x: np.argmax(np.bincount(x)),axis=0,arr=self.result)
         return predictions
 
     def predict_tree(self, node, X):
@@ -140,7 +136,7 @@ class Random_forest:
             return self.predict_tree(node.right, X)
 
 
-rf = Random_forest(100, 8, x_train, y_train)
+rf = Random_forest(2, 5, x_train, y_train)
 rf.fit()
 predictions = rf.predict(x_test)
 # 计算混淆矩阵
