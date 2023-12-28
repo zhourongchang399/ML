@@ -71,11 +71,6 @@ def lda(X, y, n_components=1):
 
     return X_lda
 
-
-# Example usage:
-# Assuming X is your data and y is the corresponding labels
-X_lda = lda(X, y, n_components=3)
-
 # 计算欧式距离
 def distance(x1, x2):
     total = np.sum((x1 - x2)**2)
@@ -110,8 +105,12 @@ class KNN:
                 error_total += 1
         return 1 - (error_total / y.shape[0])
 
+# Example usage:
+# Assuming X is your data and y is the corresponding labels
+X_lda = lda(X, y, n_components=3)
+
 # 划分训练集和测试集
-X_train, X_test, y_train, y_test = train_test_split(X_lda[:,0],
+X_train, X_test, y_train, y_test = train_test_split(X_lda,
                                                     y,
                                                     test_size=0.2,
                                                     random_state=42)
