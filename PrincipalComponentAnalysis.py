@@ -1,3 +1,4 @@
+from statistics import mean
 from sklearn.preprocessing import StandardScaler
 from sklearn.datasets import load_breast_cancer
 from sklearn.model_selection import train_test_split
@@ -10,9 +11,9 @@ from matplotlib import pyplot as plt
 
 class PCA:
 
-    def __init__(self, X, n_dismension=1) -> None:
+    def __init__(self, X, n_dimension=1) -> None:
         self.X = X
-        self.n_dismension = n_dismension
+        self.n_dimension = n_dimension
 
     # 计算协方差矩阵
     def compute_covariance(self, X):
@@ -25,7 +26,7 @@ class PCA:
         value, vector = np.linalg.eig(S)
         sorted_indices = np.argsort(value)[::-1]
         vector = vector[:, sorted_indices]
-        W = vector[:, :self.n_dismension]
+        W = vector[:, :self.n_dimension]
         return W
 
     def fit(self):
@@ -72,6 +73,10 @@ class KNN:
 
 data = load_breast_cancer()
 X, y = data["data"], data["target"]
+
+# 去中心化
+Xmean = np.mean(X, axis=0)
+X = X - Xmean
 
 # 创建 StandardScaler 对象
 scaler = StandardScaler()
