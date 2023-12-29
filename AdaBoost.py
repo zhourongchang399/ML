@@ -33,8 +33,8 @@ class AdaBoost:
 
             self.models.append(model)
 
-            # 计算错误率
-            err = np.sum(predict != self.y) / n_sample
+            # 计算加权错误率
+            err = np.sum(D[predict != self.y]) / np.sum(D)
 
             # 计算弱分类器权重
             alpha = np.log((1 - err) / err) / 2
@@ -56,14 +56,14 @@ class AdaBoost:
         return result
 
 
-dataset = load_iris()
+dataset = load_breast_cancer()
 X, y = dataset["data"], dataset["target"]
 X_train, X_test, y_train, y_test = train_test_split(X,
                                                     y,
                                                     test_size=0.2,
                                                     random_state=23)
 
-adaboostModel = AdaBoost(X_train, y_train, 5)
+adaboostModel = AdaBoost(X_train, y_train, 10)
 adaboostModel.fit()
 prediction = adaboostModel.predict(X_test)
 print(accuracy_score(prediction, y_test))
