@@ -56,7 +56,7 @@ class AdaBoost:
         return result
 
 
-dataset = load_breast_cancer()
+dataset = load_iris()
 X, y = dataset["data"], dataset["target"]
 X_train, X_test, y_train, y_test = train_test_split(X,
                                                     y,
