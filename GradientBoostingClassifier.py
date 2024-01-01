@@ -1,6 +1,4 @@
-import re
-from statistics import mode
-from sklearn.datasets import load_iris,load_breast_cancer
+from sklearn.datasets import load_iris, load_breast_cancer
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeRegressor
 from sklearn.ensemble import GradientBoostingClassifier
@@ -32,6 +30,9 @@ class GBClassifier:
         predict = y_exp / np.sum(y_exp, axis=1, keepdims=True)
         return predict
 
+    def gradient(self, y, y_pre):
+        return y - y_pre
+
     def fit(self, X, y):
 
         n_sample, _ = X.shape
@@ -41,9 +42,13 @@ class GBClassifier:
         # 独热编码
         y = np.eye(n_classes)[y]
 
-        residual = self.softmax(y)
+        t = np.ones(n_sample)
+        t = np.eye(n_classes)[t.astype(int)]
+
+        prediction = self.softmax(t)
 
         for _ in range(self.n_estimator):
+            residual = self.gradient(y, prediction)
 
             # 获取子数据集
             index = np.random.choice(n_sample,
@@ -54,8 +59,7 @@ class GBClassifier:
             # 构建弱学习器
             model = DecisionTreeRegressor(max_depth=self.max_depth)
             model.fit(X_sub, y_sub)
-            prediction = model.predict(X)
-            residual -= self.learn_rate * prediction
+            prediction += self.learn_rate * model.predict(X)
             self.models.append(model)
 
     def predict(self, X):

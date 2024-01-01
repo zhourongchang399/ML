@@ -25,20 +25,21 @@ class GBDTRegression:
 
     def fit(self, X, y):
         n_sample, _ = X.shape
-        diff_y = y.copy()
+        predict = np.zeros(n_sample)
 
         for _ in range(self.n_estimators):
+            residual = y - predict
+
             # 选择子集训练
             index = np.random.choice(n_sample,
                                      size=int(self.Subsampling * n_sample),
                                      replace=False)
-            x_sub, y_sub = X[index], diff_y[index]
+            x_sub, y_sub = X[index], residual[index]
 
             # 构建决策树
             tree = DecisionTreeRegressor(max_depth=self.max_depth)
             tree.fit(x_sub, y_sub)
-            predict = tree.predict(X)
-            diff_y -= self.learning_rate * predict
+            predict += self.learning_rate * tree.predict(X)
             self.models.append(tree)
 
     def predict(self, X):
