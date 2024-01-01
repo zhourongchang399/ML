@@ -18,7 +18,7 @@ class GBClassifier:
         # learn_rate:学习率
         # subsample:子集
         # max_depth:最大深度
-        # classes:多标签
+        # classes:多分类
 
         self.models = []
         self.n_estimator = n_estimator
@@ -73,7 +73,7 @@ X_train, X_test, y_train, y_test = train_test_split(X,
                                                     random_state=23,
                                                     test_size=0.3)
 
-gbdt = GBClassifier(100, 0.1, 1, 3)
+gbdt = GBClassifier(100, 0.1, 1, 1)
 gbdt.fit(X_train, y_train)
 predictiton = gbdt.predict(X_test)
 print(
