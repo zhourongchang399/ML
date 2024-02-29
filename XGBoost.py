@@ -1,4 +1,3 @@
-from operator import index
 from sklearn.tree import DecisionTreeRegressor
 from sklearn.model_selection import train_test_split
 from sklearn.datasets import load_boston
@@ -38,9 +37,9 @@ class XGBoostTree:
     #计算目标函数
     def obj(self, y, y_pred, depth):
         T = 2**depth
-        G = np.sum(self.gradient(y, y_pred)**2)
-        H = np.sum(self.hessian(y, y_pred) + self.reg_lambda)
-        o = self.reg_alpha * T - 0.5 * (G / H)
+        G = self.gradient(y, y_pred)
+        H = self.hessian(y, y_pred)
+        o = self.reg_alpha * T - 0.5 * np.sum(G**2 / (H + self.reg_lambda))
         return o
 
     def information_gain(self, X, y, feature_index, threshold, depth):
@@ -54,9 +53,9 @@ class XGBoostTree:
         if np.sum(left_mask) == 0 or np.sum(right_mask) == 0:
             return 0
 
-        left_child_obj = self.obj(y[left_mask], np.mean(y[left_mask]), depth)
+        left_child_obj = self.obj(y[left_mask], np.mean(y[left_mask]), depth + 1)
         right_child_obj = self.obj(y[right_mask], np.mean(y[right_mask]),
-                                   depth)
+                                   depth + 1)
 
         left_weight = np.sum(left_mask) / len(y)
         right_weight = np.sum(right_mask) / len(y)
@@ -183,9 +182,9 @@ X_train, X_test, y_train, y_test = train_test_split(X,
                                                     test_size=0.3,
                                                     random_state=23)
 
-model = XGboost(n_trees=200,
+model = XGboost(n_trees=10,
                 max_depth=3,
-                learning_rate=0.1,
+                learning_rate=0.01,
                 reg_lambda=1,
                 reg_alpha=1,
                 subsample=0.8)
